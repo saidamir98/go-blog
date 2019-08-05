@@ -1,80 +1,57 @@
-// package middlewares
+package middlewares
 
-// import (
-// 	"context"
-// 	"fmt"
-// 	"go-contacts/models"
-// 	u "lens/utils"
-// 	"net/http"
-// 	"os"
-// 	"strings"
+import (
+	"context"
+	"log"
+	"net/http"
+	"strings"
 
-// 	jwt "github.com/dgrijalva/jwt-go"
-// )
+	jwt "github.com/dgrijalva/jwt-go"
 
-// var JwtAuthentication = func(next http.Handler) http.Handler {
+	app "github.com/saidamir98/blog/app"
+	models "github.com/saidamir98/blog/models"
+	u "github.com/saidamir98/blog/utils"
+)
 
-// 	return http.HandlerFunc(func(req http.ResponseWriter, res *http.Request) {
+var JwtVerify = func(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-// 		notAuth := []string{"/api/user/new", "/api/user/login"} //List of endpoints that doesn't require auth
-// 		requestPath := res.URL.Path                             //current request path
+		notAuth := []string{"/register", "/login"}
+		requestPath := r.URL.Path
+		for _, value := range notAuth {
+			if value == requestPath {
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
 
-// 		//check if request does not need authentication, serve the request if it doesn't need it
-// 		for _, value := range notAuth {
+		tokenHeader := r.Header.Get("Authorization")
+		if tokenHeader == "" {
+			u.RespondError(w, http.StatusForbidden, "Missing auth token")
+			return
+		}
+		splitted := strings.Split(tokenHeader, " ")
+		if len(splitted) != 2 {
+			u.RespondError(w, http.StatusForbidden, "Invalid/Malformed auth token")
+			return
+		}
 
-// 			if value == requestPath {
-// 				next.ServeHTTP(req, res)
-// 				return
-// 			}
-// 		}
+		tk := &models.JwtCustomClaims{}
+		token, err := jwt.ParseWithClaims(splitted[1], tk, func(token *jwt.Token) (interface{}, error) {
+			return []byte(app.Conf["JWT_SECRET"]), nil
+		})
+		if err != nil {
+			u.RespondError(w, http.StatusForbidden, "Malformed authentication token")
+			return
+		}
+		if !token.Valid {
+			u.RespondError(w, http.StatusForbidden, "Token is not valid")
+			return
+		}
 
-// 		response := make(map[string]interface{})
-// 		tokenHeader := res.Header.Get("Authorization") //Grab the token from the header
+		log.Printf("User id %v", tk.Id)
 
-// 		if tokenHeader == "" { //Token is missing, returns with error code 403 Unauthorized
-// 			response = u.Message(false, "Missing auth token")
-// 			req.WriteHeader(http.StatusForbidden)
-// 			req.Header().Add("Content-Type", "application/json")
-// 			u.Respond(req, response)
-// 			return
-// 		}
-
-// 		splitted := strings.Split(tokenHeader, " ") //The token normally comes in format `Bearer {token-body}`, we check if the retrieved token matched this requirement
-// 		if len(splitted) != 2 {
-// 			response = u.Message(false, "Invalid/Malformed auth token")
-// 			req.WriteHeader(http.StatusForbidden)
-// 			req.Header().Add("Content-Type", "application/json")
-// 			u.Respond(req, response)
-// 			return
-// 		}
-
-// 		tokenPart := splitted[1] //Grab the token part, what we are truly interested in
-// 		tk := &models.Token{}
-
-// 		token, err := jwt.ParseWithClaims(tokenPart, tk, func(token *jwt.Token) (interface{}, error) {
-// 			return []byte(os.Getenv("token_password")), nil
-// 		})
-
-// 		if err != nil { //Malformed token, returns with http code 403 as usual
-// 			response = u.Message(false, "Malformed authentication token")
-// 			req.WriteHeader(http.StatusForbidden)
-// 			req.Header().Add("Content-Type", "application/json")
-// 			u.Respond(req, response)
-// 			return
-// 		}
-
-// 		if !token.Valid { //Token is invalid, maybe not signed on this server
-// 			response = u.Message(false, "Token is not valid.")
-// 			req.WriteHeader(http.StatusForbidden)
-// 			req.Header().Add("Content-Type", "application/json")
-// 			u.Respond(req, response)
-// 			return
-// 		}
-
-// 		//Everything went well, proceed with the request and set the caller to the user retrieved from the parsed token
-// 		fmt.Sprintf("User %", tk.Username) //Useful for monitoring
-// 		ctx := context.WithValue(res.Context(), "user", tk.UserId)
-// 		req = req.WithContext(ctx)
-// 		next.ServeHTTP(req, res) //proceed in the middleware chain!
-// 	})
-// }
+		ctx := context.WithValue(r.Context(), "user", tk)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}

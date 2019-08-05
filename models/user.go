@@ -44,7 +44,7 @@ type JwtCustomClaims struct {
 	jwt.StandardClaims
 }
 
-func (u *User) generateUserJwt() (string, error) {
+func (u *User) GenerateUserJwt() (string, error) {
 	claims := &JwtCustomClaims{
 		u.Id,
 		u.Role,

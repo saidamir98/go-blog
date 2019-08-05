@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -10,7 +9,6 @@ const (
 )
 
 var (
-	Mux  *mux.Router
 	DB   *sqlx.DB
 	Conf map[string]string
 )
