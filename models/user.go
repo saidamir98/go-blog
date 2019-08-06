@@ -14,7 +14,7 @@ type User struct {
 	Username string `json:"username" db:"username"`
 	Email    string `json:"email" db:"email"`
 	Password string `json:"password" db:"password"`
-	Role     uint   `json:"role" db:"role"`
+	RoleId   uint   `json:"roleId" db:"role_id"`
 	Active   bool   `json:"active" db:"active"`
 	BaseModel
 }
@@ -34,15 +34,15 @@ func (u *User) CheckPassword(password string) bool {
 }
 
 type JwtCustomClaims struct {
-	Id   uint `json:"id"`
-	Role uint `json:"role"`
+	Id     uint `json:"id"`
+	RoleId uint `json:"roleId"`
 	jwt.StandardClaims
 }
 
 func (u *User) GenerateUserJwt() (string, error) {
 	claims := &JwtCustomClaims{
 		u.Id,
-		u.Role,
+		u.RoleId,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
 		},
@@ -57,50 +57,3 @@ func (u *User) GenerateUserJwt() (string, error) {
 
 	return t, nil
 }
-
-// func Insert(args ...string) {
-// 	Insert("email", "test@gmil.com", "username", "farrukh")
-// 	var a = "insert into tablename"
-// 	var colNames string
-// 	var colValues string
-// 	for i, k := range args {
-// 			if i % 2 != 0 {
-// 				colNames += fmt.Sprintf("%s, ", args[k])
-// 			} else {
-// 				colValues += fmt.Sprintf("%s, ", args[k])
-// 			}
-// 	}
-// 	colNames == fmt.Sprintf("(%s)", "id, username, ")
-// 	a + colNames + "values" +  colValues
-// 	fmt.Sprintf("insert into aaa (%s) values (%s)", args[0], args[1])
-// }
-
-// func (u *User) Save() (*User, error) {
-// 	q := `INSERT INTO users (email, password, role, active)
-// 	VALUES (:email, :password, :role, :active)`
-// 	v := map[string]interface{}{
-// 		"email":    u.Email,
-// 		"password": u.Password,
-// 		"role":     u.Role,
-// 		"active":   u.Active,
-// 	}
-// 	rows, err := app.DB.NamedQuery(q, v)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	if rows.Next() {
-// 		err = rows.StructScan(&u)
-// 	}
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return u, nil
-// }
-
-// func ListAllUsers() (users []User, err error) {
-// 	err = app.DB.Select(&users, `SELECT * FROM users`)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return users, nil
-// }

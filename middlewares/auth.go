@@ -1,10 +1,11 @@
 package middlewares
 
 import (
-	"context"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/context"
 
 	jwt "github.com/dgrijalva/jwt-go"
 
@@ -36,8 +37,8 @@ var JwtVerify = func(next http.Handler) http.Handler {
 			return
 		}
 
-		tk := &models.JwtCustomClaims{}
-		token, err := jwt.ParseWithClaims(splitted[1], tk, func(token *jwt.Token) (interface{}, error) {
+		var tk models.JwtCustomClaims
+		token, err := jwt.ParseWithClaims(splitted[1], &tk, func(token *jwt.Token) (interface{}, error) {
 			return []byte(app.Conf["JWT_SECRET"]), nil
 		})
 		if err != nil {
@@ -51,7 +52,7 @@ var JwtVerify = func(next http.Handler) http.Handler {
 
 		log.Printf("User id %v", tk.Id)
 
-		ctx := context.WithValue(r.Context(), "user", tk)
-		next.ServeHTTP(w, r.WithContext(ctx))
+		context.Set(r, "user", &tk)
+		next.ServeHTTP(w, r)
 	})
 }

@@ -31,12 +31,22 @@ var Register = func(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 	user.SetPassword(user.Password)
-	user.Role = 1
+	user.RoleId = 1
 	user.Active = true
 
-	q := `INSERT INTO users (username, email, password, role, active) values (:username, :email, :password, :role, :active)`
+	q := `INSERT INTO users (username, email, password, role_id, active) values (:username, :email, :password, :role_id, :active)`
 	_, err = app.DB.NamedExec(q, user)
+	if err != nil {
+		u.RespondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	q = `
+	SELECT * FROM users 
+	WHERE email = $1
+	LIMIT 1
+	`
+	err = app.DB.Get(&user, q, user.Email)
 	if err != nil {
 		u.RespondError(w, http.StatusBadRequest, err.Error())
 		return

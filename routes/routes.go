@@ -21,6 +21,7 @@ func Handlers() *mux.Router {
 	s := r.PathPrefix("/auth").Subrouter()
 	s.Use(middlewares.JwtVerify)
 	s.HandleFunc("/test", controllers.Test).Methods("POST")
+	s.HandleFunc("/posts", controllers.CreatPost).Methods("POST")
 	// s.HandleFunc("/user", controllers.FetchUsers).Methods("GET")
 	// s.HandleFunc("/user/{id}", controllers.GetUser).Methods("GET")
 	// s.HandleFunc("/user/{id}", controllers.UpdateUser).Methods("PUT")
