@@ -15,12 +15,12 @@ func Handlers() *mux.Router {
 
 	// r.HandleFunc("/", controllers.TestAPI).Methods("GET")
 	// r.HandleFunc("/api", controllers.TestAPI).Methods("GET")
-	r.HandleFunc("/register", controllers.CreateUser).Methods("POST")
+	r.HandleFunc("/register", controllers.Register).Methods("POST")
 	// r.HandleFunc("/login", controllers.Login).Methods("POST")
 
 	s := r.PathPrefix("/auth").Subrouter()
 	s.Use(middlewares.JwtVerify)
-	s.HandleFunc("/test", controllers.CreateUser).Methods("POST")
+	s.HandleFunc("/test", controllers.Test).Methods("POST")
 	// s.HandleFunc("/user", controllers.FetchUsers).Methods("GET")
 	// s.HandleFunc("/user/{id}", controllers.GetUser).Methods("GET")
 	// s.HandleFunc("/user/{id}", controllers.UpdateUser).Methods("PUT")

@@ -3,11 +3,18 @@ package models
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	app "github.com/saidamir98/blog/app"
 )
+
+type BaseModel struct {
+	Id        uint       `json:"id" db:"id"`
+	CreatedAt *time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at" db:"updated_at"`
+}
 
 func InitDB() {
 	var (
@@ -30,8 +37,9 @@ func InitDB() {
 	DROP TABLE IF EXISTS users;
 	CREATE TABLE users(
 		id serial PRIMARY KEY,
+		username VARCHAR (255) UNIQUE NOT NULL,
 		email VARCHAR (255) UNIQUE NOT NULL,
-		password VARCHAR (50) NOT NULL,
+		password VARCHAR (255) NOT NULL,
 		role integer,
 		active BOOLEAN NOT NULL DEFAULT FALSE,
 		created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

@@ -10,13 +10,8 @@ import (
 	"golang.org/x/crypto/argon2"
 )
 
-type BaseModel struct {
-	Id        uint       `json:"id" db:"id"`
-	CreatedAt *time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at" db:"updated_at"`
-}
-
 type User struct {
+	Username string `json:"username" db:"username"`
 	Email    string `json:"email" db:"email"`
 	Password string `json:"password" db:"password"`
 	Role     uint   `json:"role" db:"role"`
