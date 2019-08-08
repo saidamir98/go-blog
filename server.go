@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/joho/godotenv"
 	app "github.com/saidamir98/blog/app"
@@ -24,10 +24,12 @@ func init() {
 }
 
 func main() {
-	addr := fmt.Sprintf("%s:%s", app.Conf["IP_ADDRESS"], app.Conf["PORT"])
+	port := os.Getenv("PORT")
+
+	// addr := fmt.Sprintf("%s:%s", app.Conf["IP_ADDRESS"], app.Conf["PORT"])
 
 	http.Handle("/", routes.Handlers())
 
-	log.Printf("On address [%s] webServer is running...\n", addr)
-	log.Fatal(http.ListenAndServe(addr, nil))
+	log.Printf("On address [%s] webServer is running...\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
