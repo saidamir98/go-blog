@@ -61,12 +61,16 @@ var Register = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := user.GenerateUserJwt()
+	var payload struct {
+		Token string `json:"token"`
+	}
+
+	payload.Token, err = user.GenerateUserJwt()
 	if err != nil {
 		u.RespondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	u.RespondJSON(w, http.StatusOK, token)
+	u.RespondJSON(w, http.StatusOK, payload)
 }
 
 var Login = func(w http.ResponseWriter, r *http.Request) {
@@ -103,10 +107,14 @@ var Login = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := user.GenerateUserJwt()
+	var payload struct {
+		Token string `json:"token"`
+	}
+
+	payload.Token, err = user.GenerateUserJwt()
 	if err != nil {
 		u.RespondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	u.RespondJSON(w, http.StatusOK, token)
+	u.RespondJSON(w, http.StatusOK, payload)
 }

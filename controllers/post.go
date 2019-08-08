@@ -12,6 +12,26 @@ import (
 	u "github.com/saidamir98/blog/utils"
 )
 
+var ListUserPosts = func(w http.ResponseWriter, r *http.Request) {
+	c := context.Get(r, "user")
+	user := c.(*models.JwtCustomClaims)
+
+	var posts []models.Post
+	q := `SELECT * FROM posts WHERE user_id=$1`
+	err := app.DB.Select(&posts, q, user.Id)
+	if err != nil {
+		u.RespondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if len(posts) <= 0 {
+		u.RespondJSON(w, http.StatusOK, "No post found")
+		return
+	}
+
+	u.RespondJSON(w, http.StatusOK, posts)
+}
+
 var CreatPost = func(w http.ResponseWriter, r *http.Request) {
 	var post models.Post
 	err := json.NewDecoder(r.Body).Decode(&post)
@@ -183,5 +203,5 @@ var DeletePost = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u.RespondJSON(w, http.StatusOK, "User has been deleted")
+	u.RespondJSON(w, http.StatusOK, "POST has been deleted")
 }

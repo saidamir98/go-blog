@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"net/http"
-
 	"github.com/gorilla/mux"
 	"github.com/saidamir98/blog/controllers"
 	"github.com/saidamir98/blog/middlewares"
@@ -11,7 +9,7 @@ import (
 func Handlers() *mux.Router {
 	r := mux.NewRouter().StrictSlash(true)
 
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	// r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	// r.HandleFunc("/", controllers.TestAPI).Methods("GET")
 	// r.HandleFunc("/api", controllers.TestAPI).Methods("GET")
@@ -21,6 +19,8 @@ func Handlers() *mux.Router {
 	s := r.PathPrefix("/auth").Subrouter()
 	s.Use(middlewares.JwtVerify)
 	// s.HandleFunc("/test", controllers.Test).Methods("POST")
+
+	s.HandleFunc("/my-posts", controllers.ListUserPosts).Methods("GET")
 	s.HandleFunc("/posts", controllers.CreatPost).Methods("POST")
 	s.HandleFunc("/posts", controllers.ListPosts).Methods("GET")
 	s.HandleFunc("/posts/{id}", controllers.GetPost).Methods("GET")
