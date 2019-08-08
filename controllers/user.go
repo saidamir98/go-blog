@@ -34,7 +34,12 @@ var Register = func(w http.ResponseWriter, r *http.Request) {
 	user.RoleId = 1
 	user.Active = true
 
-	q := `INSERT INTO users (username, email, password, role_id, active) values (:username, :email, :password, :role_id, :active)`
+	q := `
+	INSERT INTO users 
+		(username, email, password, role_id, active)
+	VALUES
+		(:username, :email, :password, :role_id, :active)
+	`
 	_, err = app.DB.NamedExec(q, user)
 	if err != nil {
 		u.RespondError(w, http.StatusBadRequest, err.Error())
@@ -42,13 +47,59 @@ var Register = func(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q = `
-	SELECT * FROM users 
-	WHERE email = $1
-	LIMIT 1
-	`
-	err = app.DB.Get(&user, q, user.Email)
+	SELECT 
+		*
+	FROM
+		users 
+	WHERE
+		username = $1
+	LIMIT 
+		1`
+	err = app.DB.Get(&user, q, user.Username)
 	if err != nil {
 		u.RespondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	token, err := user.GenerateUserJwt()
+	if err != nil {
+		u.RespondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	u.RespondJSON(w, http.StatusOK, token)
+}
+
+var Login = func(w http.ResponseWriter, r *http.Request) {
+	var userCredentials struct {
+		Username string `json:"username" db:"username"`
+		Password string `json:"password" db:"password"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&userCredentials)
+	if err != nil {
+		u.RespondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	defer r.Body.Close()
+
+	var user models.User
+	q := `
+		SELECT 
+			*
+		FROM 
+		  users u 
+		WHERE
+			u.username = $1 AND u.active
+		LIMIT
+			1`
+	err = app.DB.Get(&user, q, userCredentials.Username)
+	errorMessage := "Username or password incorrect"
+	if err != nil {
+		u.RespondError(w, http.StatusBadRequest, errorMessage)
+		return
+	}
+
+	if ok := user.CheckPassword(userCredentials.Password); !ok {
+		u.RespondError(w, http.StatusUnauthorized, errorMessage)
 		return
 	}
 
