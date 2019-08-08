@@ -26,10 +26,8 @@ func init() {
 func main() {
 	port := os.Getenv("PORT")
 
-	// addr := fmt.Sprintf("%s:%s", app.Conf["IP_ADDRESS"], app.Conf["PORT"])
-
 	http.Handle("/", routes.Handlers())
 
-	log.Printf("On address [%s] webServer is running...\n", port)
+	log.Printf("On port [%s] webServer is running...\n", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

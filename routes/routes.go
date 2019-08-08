@@ -11,7 +11,7 @@ func Handlers() *mux.Router {
 
 	// r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	// r.HandleFunc("/", controllers.TestAPI).Methods("GET")
+	r.HandleFunc("/", controllers.Test).Methods("GET")
 	// r.HandleFunc("/api", controllers.TestAPI).Methods("GET")
 	r.HandleFunc("/register", controllers.Register).Methods("POST")
 	r.HandleFunc("/login", controllers.Login).Methods("POST")

@@ -19,6 +19,11 @@ var Test = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(users) <= 0 {
+		u.RespondJSON(w, http.StatusOK, "API is running...")
+		return
+	}
+
 	u.RespondJSON(w, http.StatusOK, users)
 }
 

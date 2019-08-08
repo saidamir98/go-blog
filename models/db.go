@@ -22,8 +22,6 @@ func InitDB() {
 	)
 
 	dbUri := os.Getenv("DATABASE_URL")
-	// dbUri := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=disable",
-	// 	app.Conf["DB_HOST"], app.Conf["DB_PORT"], app.Conf["DB_NAME"], app.Conf["DB_USERNAME"], app.Conf["DB_PASSWORD"])
 
 	app.DB, err = sqlx.Connect("postgres", dbUri)
 	if err != nil {
