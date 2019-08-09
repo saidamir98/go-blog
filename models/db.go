@@ -34,10 +34,10 @@ func InitDB() {
 
 	log.Println("connected db...")
 
-	_, err = app.DB.Exec(Schemas)
-	if err != nil {
-		log.Fatalf("%+v", err)
-	}
+	// _, err = app.DB.Exec(Schemas)
+	// if err != nil {
+	// 	log.Fatalf("%+v", err)
+	// }
 	log.Println(Schemas)
 }
 
