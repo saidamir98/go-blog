@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
@@ -86,6 +87,36 @@ var ListPosts = func(w http.ResponseWriter, r *http.Request) {
 	u.RespondJSON(w, http.StatusOK, posts)
 }
 
+type User struct {
+	Username string `json:"username" db:"username"`
+	Email    string `json:"email" db:"email"`
+	Id       int    `json:"id" db:"id"`
+}
+type Reply struct {
+	User      `json:"user" db:"user"`
+	Content   string     `json:"content" db:"content"`
+	Id        int        `json:"id" db:"id"`
+	CreatedAt *time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt *time.Time `json:"updatedAt" db:"updated_at"`
+}
+type Comment struct {
+	User      `json:"user" db:"user"`
+	Content   string     `json:"content" db:"content"`
+	Replies   []Reply    `json:"replies" db:"replies"`
+	Id        int        `json:"id" db:"id"`
+	CreatedAt *time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt *time.Time `json:"updatedAt" db:"updated_at"`
+}
+type Post struct {
+	User      `json:"user" db:"user"`
+	Title     string     `json:"title" db:"title"`
+	Content   string     `json:"content" db:"content"`
+	Image     string     `json:"image" db:"image"`
+	Comments  []Comment  `json:"comments" db:"comments"`
+	Id        int        `json:"id" db:"id"`
+	CreatedAt *time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt *time.Time `json:"updatedAt" db:"updated_at"`
+}
 var GetPost = func(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
@@ -93,18 +124,66 @@ var GetPost = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	var post models.Post
+
+	var post Post
 	q := `
 		SELECT 
-			*
+			p.title, p.content, p.image, p.id, p.created_at, p.updated_at,
+			u.username as "user.username",
+			u.email as "user.email",
+			u.id as "user.id"
 		FROM 
-		  posts p 
+			posts p
+		INNER JOIN
+			users u
+		ON
+			p.user_id = u.id 
 		WHERE
 			p.id = $1`
 	err = app.DB.Get(&post, q, id)
 	if err != nil {
 		u.RespondError(w, http.StatusBadRequest, err.Error())
 		return
+	}
+
+	q = `SELECT 
+			c.content, c.id, c.created_at, c.updated_at,
+			u.username as "user.username",
+			u.email as "user.email",
+			u.id as "user.id"
+		FROM 
+			comments c
+		INNER JOIN
+			users u
+		ON
+			c.user_id = u.id 
+		WHERE
+			c.post_id = $1`
+	err = app.DB.Select(&post.Comments, q, post.Id)
+	if err != nil {
+		u.RespondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	for i := range post.Comments {
+		q = `SELECT 
+				r.content, r.id, r.created_at, r.updated_at,
+				u.username as "user.username",
+				u.email as "user.email",
+				u.id as "user.id"
+			FROM 
+				replies r
+			INNER JOIN
+				users u
+			ON
+				r.user_id = u.id 
+			WHERE
+				r.comment_id = $1`
+		err = app.DB.Select(&post.Comments[i].Replies, q, post.Comments[i].Id)
+		if err != nil {
+			u.RespondError(w, http.StatusBadRequest, err.Error())
+			return
+		}
 	}
 
 	u.RespondJSON(w, http.StatusOK, post)
@@ -129,7 +208,7 @@ var UpdatePost = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	post.Id = (uint)(id)
+	post.Id = id
 	q := `
 	UPDATE
 		posts
@@ -165,8 +244,8 @@ var UpdatePost = func(w http.ResponseWriter, r *http.Request) {
 
 var DeletePost = func(w http.ResponseWriter, r *http.Request) {
 	var dPost struct {
-		Id     int  `json:"id" db:"id"`
-		UserId uint `json:"userId" db:"user_id"`
+		Id     int `json:"id" db:"id"`
+		UserId int `json:"userId" db:"user_id"`
 	}
 
 	params := mux.Vars(r)

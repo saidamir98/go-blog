@@ -10,21 +10,21 @@ import (
 )
 
 var Test = func(w http.ResponseWriter, r *http.Request) {
-	var users []models.User
-	q := `SELECT * FROM users`
-	err := app.DB.Select(&users, q)
+	var posts []models.Post
+	q := `SELECT * FROM posts`
+	err := app.DB.Select(&posts, q)
 
 	if err != nil {
 		u.RespondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if len(users) <= 0 {
+	if len(posts) <= 0 {
 		u.RespondJSON(w, http.StatusOK, "API is running...")
 		return
 	}
 
-	u.RespondJSON(w, http.StatusOK, users)
+	u.RespondJSON(w, http.StatusOK, posts)
 }
 
 var Register = func(w http.ResponseWriter, r *http.Request) {

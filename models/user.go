@@ -14,7 +14,7 @@ type User struct {
 	Username string `json:"username" db:"username"`
 	Email    string `json:"email" db:"email"`
 	Password string `json:"password" db:"password"`
-	RoleId   uint   `json:"roleId" db:"role_id"`
+	RoleId   int    `json:"roleId" db:"role_id"`
 	Active   bool   `json:"active" db:"active"`
 	BaseModel
 }
@@ -34,8 +34,8 @@ func (u *User) CheckPassword(password string) bool {
 }
 
 type JwtCustomClaims struct {
-	Id     uint `json:"id"`
-	RoleId uint `json:"roleId"`
+	Id     int `json:"id"`
+	RoleId int `json:"roleId"`
 	jwt.StandardClaims
 }
 

@@ -26,5 +26,13 @@ func Handlers() *mux.Router {
 	s.HandleFunc("/posts/{id}", controllers.GetPost).Methods("GET")
 	s.HandleFunc("/posts/{id}", controllers.UpdatePost).Methods("PUT")
 	s.HandleFunc("/posts/{id}", controllers.DeletePost).Methods("DELETE")
+
+	s.HandleFunc("/comments", controllers.CreatComment).Methods("POST")
+	s.HandleFunc("/comments/{id}", controllers.UpdateComment).Methods("PUT")
+	s.HandleFunc("/comments/{id}", controllers.DeleteComment).Methods("DELETE")
+
+	s.HandleFunc("/replies", controllers.CreatReply).Methods("POST")
+	s.HandleFunc("/replies/{id}", controllers.UpdateReply).Methods("PUT")
+	s.HandleFunc("/replies/{id}", controllers.DeleteReply).Methods("DELETE")
 	return r
 }

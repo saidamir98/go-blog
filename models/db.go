@@ -5,13 +5,14 @@ import (
 	"os"
 	"time"
 
+	// _ "github.com/jackc/pgx"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	app "github.com/saidamir98/blog/app"
 )
 
 type BaseModel struct {
-	Id        uint       `json:"id" db:"id"`
+	Id        int        `json:"id" db:"id"`
 	CreatedAt *time.Time `json:"createdAt" db:"created_at"`
 	UpdatedAt *time.Time `json:"updatedAt" db:"updated_at"`
 }
@@ -33,10 +34,11 @@ func InitDB() {
 
 	log.Println("connected db...")
 
-	_, err = app.DB.Exec(Schemas)
-	if err != nil {
-		log.Fatalf("%+v", err)
-	}
+	// _, err = app.DB.Exec(Schemas)
+	// if err != nil {
+	// 	log.Fatalf("%+v", err)
+	// }
+	log.Println(Schemas)
 }
 
 var Schemas = `
@@ -59,6 +61,26 @@ var Schemas = `
 		content TEXT UNIQUE NOT NULL,
 		image VARCHAR(255),
 		user_id INTEGER,
+		created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+
+	DROP TABLE IF EXISTS comments;
+	CREATE TABLE comments(
+		id serial PRIMARY KEY,
+		content TEXT UNIQUE NOT NULL,
+		user_id INTEGER,
+		post_id INTEGER,
+		created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+
+	DROP TABLE IF EXISTS replies;
+	CREATE TABLE replies(
+		id serial PRIMARY KEY,
+		content TEXT UNIQUE NOT NULL,
+		user_id INTEGER,
+		comment_id INTEGER,
 		created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 	);
