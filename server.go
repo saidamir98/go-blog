@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 	app "github.com/saidamir98/blog/app"
 	models "github.com/saidamir98/blog/models"
 	routes "github.com/saidamir98/blog/routes"
@@ -29,6 +29,7 @@ func main() {
 
 	http.Handle("/", routes.Handlers())
 
+	handler := cors.Default().Handler(routes.Handlers())
 	log.Printf("On port [%s] webServer is running...\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS()(routes())))
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
