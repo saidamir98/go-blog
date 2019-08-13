@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-
+	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
 	app "github.com/saidamir98/blog/app"
 	models "github.com/saidamir98/blog/models"
@@ -29,5 +29,5 @@ func main() {
 	http.Handle("/", routes.Handlers())
 
 	log.Printf("On port [%s] webServer is running...\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS()(r)))
 }
