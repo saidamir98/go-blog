@@ -9,7 +9,7 @@ import (
 func Handlers() *mux.Router {
 	r := mux.NewRouter().StrictSlash(true)
 	// r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-
+	r.Use(middlewares.Cors)
 	r.HandleFunc("/", controllers.Test).Methods("GET")
 	// r.HandleFunc("/api", controllers.TestAPI).Methods("GET")
 	r.HandleFunc("/register", controllers.Register).Methods("POST")
