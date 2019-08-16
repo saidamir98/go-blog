@@ -6,7 +6,7 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	app "github.com/saidamir98/blog/app"
+	app "github.com/saidamir98/go-blog/app"
 	"golang.org/x/crypto/argon2"
 )
 

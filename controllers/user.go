@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	app "github.com/saidamir98/blog/app"
-	models "github.com/saidamir98/blog/models"
-	u "github.com/saidamir98/blog/utils"
+	app "github.com/saidamir98/go-blog/app"
+	models "github.com/saidamir98/go-blog/models"
+	u "github.com/saidamir98/go-blog/utils"
 )
 
 var Test = func(w http.ResponseWriter, r *http.Request) {

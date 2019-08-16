@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/saidamir98/blog/controllers"
-	"github.com/saidamir98/blog/middlewares"
+	"github.com/saidamir98/go-blog/controllers"
+	"github.com/saidamir98/go-blog/middlewares"
 )
 
 func Handlers() *mux.Router {

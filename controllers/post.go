@@ -8,9 +8,9 @@ import (
 
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
-	app "github.com/saidamir98/blog/app"
-	models "github.com/saidamir98/blog/models"
-	u "github.com/saidamir98/blog/utils"
+	app "github.com/saidamir98/go-blog/app"
+	models "github.com/saidamir98/go-blog/models"
+	u "github.com/saidamir98/go-blog/utils"
 )
 
 var ListUserPosts = func(w http.ResponseWriter, r *http.Request) {
@@ -117,6 +117,7 @@ type Post struct {
 	CreatedAt *time.Time `json:"createdAt" db:"created_at"`
 	UpdatedAt *time.Time `json:"updatedAt" db:"updated_at"`
 }
+
 var GetPost = func(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])

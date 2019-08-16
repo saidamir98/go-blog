@@ -8,7 +8,7 @@ import (
 	// _ "github.com/jackc/pgx"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	app "github.com/saidamir98/blog/app"
+	app "github.com/saidamir98/go-blog/app"
 )
 
 type BaseModel struct {

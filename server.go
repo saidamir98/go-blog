@@ -6,10 +6,9 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/rs/cors"
-	app "github.com/saidamir98/blog/app"
-	models "github.com/saidamir98/blog/models"
-	routes "github.com/saidamir98/blog/routes"
+	app "github.com/saidamir98/go-blog/app"
+	models "github.com/saidamir98/go-blog/models"
+	routes "github.com/saidamir98/go-blog/routes"
 )
 
 func init() {
@@ -29,7 +28,6 @@ func main() {
 
 	http.Handle("/", routes.Handlers())
 
-	handler := cors.Default().Handler(routes.Handlers())
 	log.Printf("On port [%s] webServer is running...\n", port)
 	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
