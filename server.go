@@ -29,5 +29,5 @@ func main() {
 	http.Handle("/", routes.Handlers())
 
 	log.Printf("On port [%s] webServer is running...\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, handler))
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
